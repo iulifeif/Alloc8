@@ -1,11 +1,9 @@
 from django.contrib.auth import authenticate
-from django.http import HttpResponse
 from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import User
+from .models import Employee
 from .serializer import UserSerializer
 
 
@@ -13,7 +11,7 @@ class UsersView(APIView):
     serializer_class = UserSerializer
 
     def get(self, request, *args, **kwargs):
-        users = User.objects.all()
+        users = Employee.objects.all()
         serializer = self.serializer_class(users, many=True)
         return Response(serializer.data)
 
