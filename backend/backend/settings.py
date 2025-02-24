@@ -31,7 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
-AUTH_USER_MODEL = 'manage_users.User'
+AUTH_USER_MODEL = 'manage_users.Employee'
 
 # Application definition
 
@@ -146,4 +146,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]

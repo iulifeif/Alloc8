@@ -1,7 +1,6 @@
 import uuid
 
-from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, AbstractUser
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 NORMAL_USER = "user"
@@ -15,42 +14,23 @@ USER_ROLE_CHOICES = [
 ]
 
 
-class UserManager(BaseUserManager):
-    def create_user(self, credentials):
-        if not credentials["email"]:
-            raise ValueError('User must have an email address')
-        email = self.normalize_email(credentials["email"])
-        user = self.model(role=credentials.get("role", None),
-                          email=email,
-                          first_name=credentials["first_name"],
-                          last_name=credentials["last_name"],
-                          password=credentials["password"])
-        user.set_password(credentials["password"])
-        user.save(usinng=self._db)
-        return user
-
-    def create_superuser(self, credentials):
-        user = self.create_user(credentials)
-        user.role = ADMIN_USER
-        user.is_superuser = True
-        user.is_staff = True
-        user.save(using=self._db)
-        return user
-
-
-class User(AbstractUser, PermissionsMixin):
+class Employee(AbstractUser):
     """Represents a user in the system"""
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, unique=True)
-    password = models.CharField(max_length=255)
     role = models.CharField(max_length=15, default=NORMAL_USER, choices=USER_ROLE_CHOICES)
-    skills = models.ManyToManyField('Skill', blank=True, related_name='users_skills')
-    goals = models.ManyToManyField('Goal', blank=True, related_name='users_goals')
+    skills = models.ManyToManyField('Skill', blank=True, related_name='employee_skills')
+    goals = models.ManyToManyField('Goal', blank=True, related_name='employee_goals')
+
+    USERNAME_FIELD = "email"
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} {self.email}"
+
+    class Meta:
+        db_table = "employee"
 
 
 class Skill(models.Model):
@@ -60,6 +40,9 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        db_table = "skill"
+
 
 class Goal(models.Model):
     """Represents a learning or career goal that can be assigned to multiple users"""
@@ -68,14 +51,20 @@ class Goal(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        db_table = "goal"
+
 
 class Project(models.Model):
     """Represents a project to which users can be alloc8ed"""
     name = models.CharField(max_length=100)
-    employees = models.ManyToManyField(User, blank=True, related_name='projects')
+    employees = models.ManyToManyField(Employee, blank=True, related_name='projects')
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        db_table = "project"
 
 
 class Position(models.Model):
@@ -86,7 +75,10 @@ class Position(models.Model):
     responsibilities = models.TextField()
     skills = models.ManyToManyField(Skill, blank=True, related_name='position_skills')
     technical_background = models.TextField()
-    nice_to_have = models.TextField(blank=True)
+    nice_to_have = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        db_table = "position"

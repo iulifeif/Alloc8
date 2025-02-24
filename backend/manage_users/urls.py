@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.urls import path
-from . import views
-from .views import ReactView
+from .views import UsersView, LogInView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user/', ReactView.as_view(), name='User class'),
+    path('users/', UsersView.as_view(), name="users"),
+    path('login/', LogInView.as_view(), name='login'),
 ]

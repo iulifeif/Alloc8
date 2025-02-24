@@ -1,9 +1,9 @@
 from django.dispatch import receiver
 from django.db.models.signals import m2m_changed, post_delete
-from .models import User, Skill, Goal
+from .models import Employee, Skill, Goal
 
 
-@receiver(m2m_changed, sender=User.skills.through)
+@receiver(m2m_changed, sender=Employee.skills.through)
 def cleanup_skills(sender, instance, action, **kwargs):
     if action == 'post_remove':
         for skill in Skill.objects.all():
@@ -11,7 +11,7 @@ def cleanup_skills(sender, instance, action, **kwargs):
                 skill.delete()
 
 
-@receiver(m2m_changed, sender=User.goals.through)
+@receiver(m2m_changed, sender=Employee.goals.through)
 def cleanup_goals(sender, instance, action, **kwargs):
     if action == 'post_remove':
         for goal in Goal.objects.all():
@@ -19,7 +19,7 @@ def cleanup_goals(sender, instance, action, **kwargs):
                 goal.delete()
 
 
-@receiver(post_delete, sender=User)
+@receiver(post_delete, sender=Employee)
 def cleanup_user_related_data(sender, instance, **kwargs):
     instance.projects.clear()
 

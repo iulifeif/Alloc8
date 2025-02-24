@@ -1,23 +1,29 @@
+from django.contrib.auth import authenticate
 from django.http import HttpResponse
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
 from .serializer import UserSerializer
 
 
-class ReactView(APIView):
+class UsersView(APIView):
     serializer_class = UserSerializer
 
-    def index(request):
-        users_list = User.objects.all()
-        output = ", ".join([u.first_name for u in users_list])
-        return HttpResponse(output)
+    def get(self, request, *args, **kwargs):
+        users = User.objects.all()
+        serializer = self.serializer_class(users, many=True)
+        return Response(serializer.data)
 
-    def handle_signup(request):
-        return HttpResponse("Sign up")
 
-    def login(request, credentials):
-        return HttpResponse("Hello %s" % credentials.username)
+class LogInView(APIView):
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
 
-    def logout(request):
-        return HttpResponse("Log out")
+        user = authenticate(username=username, password=password)
+        if user:
+            return Response({"message": f"Hello, {user.username}!"}, status=status.HTTP_200_OK)
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
