@@ -24,6 +24,7 @@ class Employee(AbstractUser):
     skills = models.ManyToManyField('Skill', blank=True, related_name='employee_skills')
     goals = models.ManyToManyField('Goal', blank=True, related_name='employee_goals')
 
+    REQUIRED_FIELDS = ["first_name", "last_name", "role"]
     USERNAME_FIELD = "email"
 
     def __str__(self):
