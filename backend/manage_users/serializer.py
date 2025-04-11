@@ -2,7 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.validators import validate_email
 from rest_framework import serializers
 
-from .models import Employee, Goal, Project, Position, Skill
+from .models import Employee, Goal, Project, Position
 
 
 """Serializers for the models"""
@@ -36,9 +36,10 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
-        employee = Employee.objects.create(**validated_data, password=password)
-        # employee.set_password(password)
+        password = validated_data.pop("password")
+        validated_data["username"] = validated_data["first_name"] + " " + validated_data["last_name"]
+        employee = Employee.objects.create(**validated_data)
+        employee.set_password(password)
         employee.save()
         return employee
 

@@ -24,17 +24,11 @@ class Employee(AbstractUser):
     skills = models.ManyToManyField('Skill', blank=True, related_name='employee_skills')
     goals = models.ManyToManyField('Goal', blank=True, related_name='employee_goals')
 
-    # USERNAME_FIELD = "email"
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "role", "password"]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} {self.email}"
-
-    def save(self, *args, **kargs):
-        self.username = (str(self.email).split('@'))[0]
-        if not self.pk or not self.password.startswith('pbkdf2_'):
-            self.set_password(self.password)
-        super().save(*args, **kargs)
 
     class Meta:
         db_table = "employee"
