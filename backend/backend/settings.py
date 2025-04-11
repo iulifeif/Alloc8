@@ -29,6 +29,24 @@ SECRET_KEY = 'django-insecure-uqqkg7o^9zos+2#bha0vhm^@horxggrhc9xtr3a-j=wfpr&exx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# if DEBUG:
+#     LOGGING = {
+#         'version': 1,
+#         'disable_existing_loggers': False,
+#         'handlers': {
+#             'console': {
+#                 'level': 'DEBUG',
+#                 'class': 'logging.StreamHandler',
+#             },
+#         },
+#         'loggers': {
+#             'django.db.backends': {
+#                 'handlers': ['console'],
+#                 'level': 'DEBUG',
+#             },
+#         },
+#     }
+
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 AUTH_USER_MODEL = 'manage_users.Employee'
@@ -45,6 +63,7 @@ INSTALLED_APPS = [
     'manage_users.apps.ManageUsersConfig',
     'rest_framework',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -146,6 +165,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+CORS_ALLOW_ALL_ORIGINS = True
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend' # Default backend username and password
 ]
