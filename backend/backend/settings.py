@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 
 import environ
+import rest_framework.parsers
 
 env = environ.Env()
 environ.Env.read_env()
@@ -67,6 +68,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,7 +76,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'manage_users.urls'
@@ -158,14 +159,41 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',  # Use sessions
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
+        'rest_framework.permissions.IsAuthenticated',  # Require authentication by default
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
     ]
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend' # Default backend username and password
 ]
+
+SESSION_COOKIE_SECURE = True # Only send cookies over HTTPS in production
+SESSION_COOKIE_HTTPONLY = True # Prevent client-side JavaScript access
+SESSION_COOKIE_SAMESITE = 'None' # Crucial for cross-site requests
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_AGE = 3600  # Expire session after 1 hour of inactivity
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Clear session after browser is closed
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",  # React Development Server
+]
+
+# Enable CORS for cross-origin requests
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # React Development Server
+]
+

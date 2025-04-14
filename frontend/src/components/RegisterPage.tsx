@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import getCsrfToken from "./utils";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -43,35 +44,30 @@ const RegisterPage = () => {
         password,
       });
 
-      try {
-        console.log("123");
-        interface RegisterResponse {
-          message: string;
-        }
+      const csrfToken = await getCsrfToken();
+      console.log("CSRF Token:", csrfToken); // Store or use for requests
 
-        const response = await axios.post<RegisterResponse>(
-          "http://localhost:8000/auth/register",
-          { first_name, last_name, email, password }
-        );
-
-        if (response.status === 200) {
-          console.log(response.data.message);
-          alert(response.data.message);
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error(
-            "Error: ",
-            (error as any).response?.data || (error as any).message
+      const response = await axios
+        .post(
+          "http://localhost:8000/auth/register/",
+          { first_name, last_name, email, password },
+          {
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log("Login successful: ", response.data);
+        })
+        .catch((error) => {
+          console.log(
+            "Login failed: ",
+            error.response ? error.response.data : error.message
           );
-        } else {
-          console.error("Error: ", error);
-          alert(
-            "Registration failed: " + (error as any).response?.data ||
-              (error as any).message
-          );
-        }
-      }
+        });
     }
   };
 
@@ -199,4 +195,5 @@ const RegisterPage = () => {
     </Box>
   );
 };
+
 export default RegisterPage;

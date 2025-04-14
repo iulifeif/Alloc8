@@ -6,12 +6,13 @@ import {
   Typography,
   IconButton,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axios, { get } from "axios";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import getCsrfToken from "./utils";
 
 const LogInPage = () => {
   const [email, setEmail] = useState("");
@@ -19,6 +20,20 @@ const LogInPage = () => {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [csrfToken, setCsrfToken] = useState("");
+
+  // Fetch CSRF token when the component mounts
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/csrf/", { withCredentials: true })
+      .then((response) => {
+        setCsrfToken(response.data.csrfToken); // Store the CSRF token
+        console.log("CSRF Token fetched:", response.data.csrfToken);
+      })
+      .catch((error) => {
+        console.error("Error fetching CSRF token:", error);
+      });
+  }, []);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -38,36 +53,27 @@ const LogInPage = () => {
         email,
         password,
       });
-
-      try {
-        console.log("123");
-        interface RegisterResponse {
-          message: string;
-        }
-
-        const response = await axios.post<RegisterResponse>(
-          "http://localhost:8000/auth/login",
-          { email, password }
-        );
-
-        if (response.status === 200) {
-          console.log(response.data.message);
-          alert(response.data.message);
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error(
-            "Error: ",
-            (error as any).response?.data || (error as any).message
+      const response = await axios
+        .post(
+          "http://localhost:8000/auth/login/",
+          { email, password },
+          {
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log("Login successful: ", response.data);
+        })
+        .catch((error) => {
+          console.log(
+            "Login failed: ",
+            error.response ? error.response.data : error.message
           );
-        } else {
-          console.error("Error: ", error);
-          alert(
-            "Registration failed: " + (error as any).response?.data ||
-              (error as any).message
-          );
-        }
-      }
+        });
     }
   };
 
