@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import getCsrfToken from "./utils";
+import Cookies from "js-cookie";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -22,6 +22,7 @@ const RegisterPage = () => {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [csrfToken, setCsrfToken] = useState("");
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -44,8 +45,8 @@ const RegisterPage = () => {
         password,
       });
 
-      const csrfToken = await getCsrfToken();
-      console.log("CSRF Token:", csrfToken); // Store or use for requests
+      setCsrfToken(Cookies.get("csrftoken") || csrfToken);
+      console.log("CSRF-Token:", csrfToken);
 
       const response = await axios
         .post(

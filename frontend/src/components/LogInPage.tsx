@@ -6,13 +6,14 @@ import {
   Typography,
   IconButton,
 } from "@mui/material";
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import axios, { get } from "axios";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import getCsrfToken from "./utils";
+// import getCsrfToken from "./utils";
+import Cookies from "js-cookie";
 
 const LogInPage = () => {
   const [email, setEmail] = useState("");
@@ -21,19 +22,7 @@ const LogInPage = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [csrfToken, setCsrfToken] = useState("");
-
-  // Fetch CSRF token when the component mounts
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/csrf/", { withCredentials: true })
-      .then((response) => {
-        setCsrfToken(response.data.csrfToken); // Store the CSRF token
-        console.log("CSRF Token fetched:", response.data.csrfToken);
-      })
-      .catch((error) => {
-        console.error("Error fetching CSRF token:", error);
-      });
-  }, []);
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -53,6 +42,9 @@ const LogInPage = () => {
         email,
         password,
       });
+
+      setCsrfToken(Cookies.get("csrftoken") || csrfToken);
+      console.log("CSRF-Token:", csrfToken); // Store or use for requests
       const response = await axios
         .post(
           "http://localhost:8000/auth/login/",
@@ -67,6 +59,8 @@ const LogInPage = () => {
         )
         .then((response) => {
           console.log("Login successful: ", response.data);
+          localStorage.setItem("username", email);
+          navigate("/home");
         })
         .catch((error) => {
           console.log(
