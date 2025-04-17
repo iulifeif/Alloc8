@@ -12,7 +12,6 @@ import axios from "axios";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-// import getCsrfToken from "./utils";
 import Cookies from "js-cookie";
 
 const LogInPage = () => {
@@ -38,11 +37,6 @@ const LogInPage = () => {
     }
 
     if (email && password) {
-      console.log("Form submitted:", {
-        email,
-        password,
-      });
-
       setCsrfToken(Cookies.get("csrftoken") || csrfToken);
       console.log("CSRF-Token:", csrfToken); // Store or use for requests
       const response = await axios

@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -23,6 +23,7 @@ const RegisterPage = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [csrfToken, setCsrfToken] = useState("");
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -38,13 +39,6 @@ const RegisterPage = () => {
     }
 
     if (first_name && last_name && email && password) {
-      console.log("Form submitted:", {
-        first_name,
-        last_name,
-        email,
-        password,
-      });
-
       setCsrfToken(Cookies.get("csrftoken") || csrfToken);
       console.log("CSRF-Token:", csrfToken);
 
@@ -62,6 +56,7 @@ const RegisterPage = () => {
         )
         .then((response) => {
           console.log("Login successful: ", response.data);
+          navigate("/login");
         })
         .catch((error) => {
           console.log(
