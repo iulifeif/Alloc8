@@ -1,7 +1,6 @@
-// SkillsPage.jsx
 import { Box } from "@mui/material";
 
-const SkillsPage = () => {
+const Notifications = () => {
   return (
     <Box
       sx={{
@@ -10,13 +9,12 @@ const SkillsPage = () => {
         alignItems: "center",
         width: "100%",
         height: "100%",
-        bgcolor: "lightblue", // Just for visual distinction
+        bgcolor: "lightyellow", // Just for visual distinction
       }}
     >
-      <div>Skills Content Goes Here</div>
-      {/* Add your skills-related components */}
+      <div>Notifications</div>
     </Box>
   );
 };
 
-export default SkillsPage;
+export default Notifications;
