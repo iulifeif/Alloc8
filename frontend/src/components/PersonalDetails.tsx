@@ -12,8 +12,8 @@ const PersonalDetails = () => {
         bgcolor: "lightyellow", // Just for visual distinction
       }}
     >
-      <div>PersonalDetails</div>
-      {/* Add your open roles components */}
+      <div>Personal dashboard</div>
+
     </Box>
   );
 };
